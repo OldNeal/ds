@@ -1,0 +1,11 @@
+clientele==2.3.0
+httpx2==2.13.1
+loguru==0.7.3
+Markdown==3.11
+pydantic==2.13.5
+python-dotenv==1.2.4
+redis==8.1.0
+pydantic-settings==2.14.1
+json5==0.17.3
+redis==8.1.0
+py-cord[speed]==2.7.2
