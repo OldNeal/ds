@@ -20,7 +20,7 @@ class BaseLogic:
 
     @property
     async def user_id(self):
-        return await self.get_user_id(self.ds_id)
+        return None
 
     @property
     async def body(self):
@@ -39,19 +39,23 @@ class BaseLogic:
         return self.kwargs.get('guild_id')
         
     @classmethod
-    async def test_api_connect(cls, logged: bool = True):
+    async def test_api_connect(cls, logged: bool = True, is_raise: bool = False):
         try:
-            start = datetime.now()
-            response = await cls.client.main()
-            if response:
-                end = datetime.now()
-                result = f'{int((end - start).total_seconds()*1000)}'
-                if logged:
-                    botlog.logger.info('API работает', ping=result, url=cls.client.client.config.base_url)
-                return result
-            raise ApiTimeoutError('API не работает')
+            try:
+                start = datetime.now()
+                response = await cls.client.main()
+                if response:
+                    end = datetime.now()
+                    result = f'{int((end - start).total_seconds()*1000)}'
+                    if logged:
+                        botlog.logger.info('API работает', ping=result, url=cls.client.client.config.base_url)
+                    return result
+                raise ApiTimeoutError('API не работает')
+            except:
+                raise ApiTimeoutError('API не работает')
         except:
-            raise ApiTimeoutError('API не работает')
+            if is_raise:
+                raise
 
     def redact_kwargs(self, **new_kwargs):
         self.kwargs |= new_kwargs

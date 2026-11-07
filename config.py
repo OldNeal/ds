@@ -1,4 +1,6 @@
 import os, redis.asyncio as redis
+from discord import Intents
+from discord.ext import commands
 from dotenv import load_dotenv
 from pathlib import Path
 from discord import Bot
@@ -20,7 +22,7 @@ class Settings:
     state_ttl = int(os.getenv('state_ttl', 60*60*24))
     data_ttl = int(os.getenv('data_ttl', 60*60*24))
 
-    redis_host = os.getenv('redis_host', 'localhost')   
+    redis_host = os.getenv('redis_host', 'localhost')
     redis_port = int(os.getenv('redis_port', 6379))
     redis_password = os.getenv('redis_password')
 
@@ -50,5 +52,14 @@ class Settings:
     def bot(self) -> Bot:
         return self.info.get('main')
 
+
 settings = Settings()
-bot = Bot()
+
+intents = Intents.default()
+intents.message_content = True  # Критически важно!
+
+bot = commands.Bot(
+    command_prefix=['!'], 
+    intents=intents, 
+    default_member_permissions=None
+    )

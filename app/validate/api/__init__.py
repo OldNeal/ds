@@ -1,7 +1,7 @@
 from app.api.schemas import *
-from app.api.schemas import AnswerPathFullInfo as AnswerPathFullInfoApi
+from app.api.schemas import AnswerPathFullInfo as AnswerPathFullInfoPath
 
-class AnswerPathFullInfo(AnswerPathFullInfoApi):
+class AnswerPathFullInfo(AnswerPathFullInfoPath):
     @property
     def seq_dict(self):
         return {s.number:s for s in self.seqs}

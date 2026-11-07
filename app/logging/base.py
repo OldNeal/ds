@@ -6,10 +6,10 @@ from typing import Literal
 from app.logging.paths import PurePath, LogPaths
 
 class BotLog:
-    def __init__(self, terminal_level: Literal['trace', 'debug', 'info', 'success', 'warning', 'error', 'critical'] = 'debug'):
+    def __init__(self, terminal_level: Literal['trace', 'debug', 'info', 'success', 'warning', 'error', 'critical'] = 'debug', logger = loguru.logger):
         self.terminal_level = terminal_level.upper()
         self.loguru = loguru
-        self.logger = self.loguru.logger
+        self.logger = logger
         self.log_format = """{level.icon}  | <green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level}</level> | <cyan>{message}</cyan> | <blue>[{extra}]</blue>"""
         self.levels = self.create_levels()
         self.sinks = self.handlers()
@@ -91,6 +91,10 @@ class BotLog:
             self.logger.level("BOT START", no=25, color="<white>", icon="🏁"),
             self.logger.level("BOT STOP", no=26, color="<white>", icon="🛑"),
         ]
+
+    def bind(self, **kwargs):
+        self.logger = self.logger.bind(**kwargs)
+        return self
  
     def decor(self, timer: bool = False, arg: bool = False, logger_kwargs: dict = {}):
         def decorator(func):
@@ -115,9 +119,8 @@ class BotLog:
     def message(self, msg: str, **kwargs):
         self.logger.log('MESSAGE', f'Text: {msg}', **kwargs)
 
-    def callback(self, callback_data: str, **kwargs):
-        prefix, data = callback_data.split(':', maxsplit=1)
-        self.logger.log('CALLBACK', f'Prefix: {prefix}, Data: {data}', **kwargs)
+    def callback(self, prefix: str, data: dict, **kwargs):
+        self.logger.log('CALLBACK', f'Custom ID: {prefix}', **kwargs | {'data':data})
         
     def start(self, **kwargs):
         self.logger.log('BOT START', f'Бот запущен', **kwargs)
@@ -125,4 +128,10 @@ class BotLog:
     def stop(self, **kwargs):
         self.logger.log('BOT STOP', f'Бот останавливается', **kwargs)
 
-botlog = BotLog()
+class BotLogger(BotLog):
+    def __init__(self, logger = loguru.logger):
+        self.loguru = loguru
+        self.logger = logger
+
+global_botlog = BotLog()
+botlog = BotLogger(logger=global_botlog.logger)
